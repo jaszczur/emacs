@@ -118,8 +118,8 @@ automatically exports the configuration here to the associated output files.
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
 
-(setq elpaca-ignored-dependencies
-  (cl-set-difference elpaca-ignored-dependencies (list 'seq 'transient)))
+;; (setq elpaca-ignored-dependencies 
+;;       (cl-set-difference elpaca-ignored-dependencies (list 'seq 'transient)))
 #+end_src
 
 ** Use Package
