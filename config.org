@@ -296,14 +296,14 @@ To search and replace, use query-replace-regexp to replace one by one C-M-% (SPC
       (inhibit-startup-screen t)  ;; Disable welcome screen
 
       (delete-selection-mode t)   ;; Select text and delete it by typing.
-      (electric-indent-mode -1)  ;; Turn off the weird indenting that Emacs does by default.
+      (electric-indent-mode nil)  ;; Turn off the weird indenting that Emacs does by default.
       (electric-pair-mode t)      ;; Turns on automatic parens pairing
 
       (blink-cursor-mode nil)     ;; Don't blink cursor
       (global-auto-revert-mode t) ;; Automatically reload file and show changes if the file has changed
 
       ;;(dired-kill-when-opening-new-dired-buffer t) ;; Dired don't create new buffer
-      ;;(recentf-mode t) ;; Enable recent file mode
+      (recentf-mode t) ;; Enable recent file mode
 
       ;;(global-visual-line-mode t)           ;; Enable truncated lines
       (display-line-numbers-type 'relative) ;; Relative line numbers
@@ -421,6 +421,9 @@ Replace the default modeline with a prettier more useful.
       :after treemacs)
     (use-package treemacs-evil
       :after treemacs evil)
+    (use-package treemacs-nerd-icons
+      :after treemacs
+      :config (treemacs-load-theme "nerd-icons"))
 #+end_src
 * Development
 ** Projectile
