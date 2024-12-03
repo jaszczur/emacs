@@ -1,12 +1,4 @@
-/auto-save-list/
-/.cache/
-/config.el
-/eln-cache/
-/elpaca/
-/eshell/
-/history
-/projectile-bookmarks.eld
-/recentf
-/transient/
-\#*\#
-*~
+*
+!config.org
+!init.el
+!early-init.el
