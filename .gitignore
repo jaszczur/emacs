@@ -1,10 +1,12 @@
-/.cache/
 /auto-save-list/
+/.cache/
+/config.el
+/eln-cache/
 /elpaca/
 /eshell/
-/config.el
 /history
 /projectile-bookmarks.eld
 /recentf
+/transient/
 \#*\#
 *~
