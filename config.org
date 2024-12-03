@@ -11,7 +11,6 @@
   - [[#elpaca-package-manager][Elpaca package manager]]
   - [[#use-package][Use Package]]
   - [[#evil-mode][Evil Mode]]
-  - [[#colemak-adjustments][Colemak adjustments]]
   - [[#general-keybindings][General Keybindings]]
   - [[#diminish][Diminish]]
   - [[#elpaca-wait][ELPACA WAIT]]
@@ -118,6 +117,9 @@ automatically exports the configuration here to the associated output files.
     (load "./elpaca-autoloads")))
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
+
+(setq elpaca-ignored-dependencies
+  (cl-set-difference elpaca-ignored-dependencies (list 'seq 'transient)))
 #+end_src
 
 ** Use Package
@@ -167,18 +169,6 @@ If you don't want to use evil-mode don't forget to remove:
       (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult))
       (setq evil-collection-key-blacklist (append (list "SPC" ",") evil-collection-key-blacklist))
       (evil-collection-init))
-#+end_src
-
-** Colemak adjustments
-
-#+begin_src emacs-lisp
-    (use-package evil-colemak-basics
-      :after evil
-      :init
-      (setq evil-colemak-basics-rotate-t-f-j t
-            evil-escape-key-sequence "vk")
-      :config
-      (global-evil-colemak-basics-mode))
 #+end_src
 
 ** General Keybindings
@@ -714,31 +704,9 @@ While nerd-icons supports both GUI and TUI.
 
 ** Git
 *** Magit
-
-WIP - all source blocks changed to common-lisp so it's excluded from final el file.
-
-First we need to apply workaround for seq version required by Magit which is newer than supplied in emacs-29.1.
-
-#+begin_src common-lisp
-(defun +elpaca-unload-seq (e)
-  (and (featurep 'seq) (unload-feature 'seq t))
-  (elpaca--continue-build e))
-
-;; You could embed this code directly in the reicpe, I just abstracted it into a function.
-(defun +elpaca-seq-build-steps ()
-  (append (butlast (if (file-exists-p (expand-file-name "seq" elpaca-builds-directory))
-                       elpaca--pre-built-steps elpaca-build-steps))
-          (list '+elpaca-unload-seq 'elpaca--activate-package)))
-
-(elpaca `(seq :build ,(+elpaca-seq-build-steps)))
-    ;(use-package transient 
-    ;  :ensure (transient :host github :repo "magit/transient" :tag "v0.7.9")
-#+end_src
-
 Complete text-based user interface to Git.
-#+begin_src common-lisp
+#+begin_src emacs-lisp
     (use-package magit
-      :after seq
       ;;:ensure (magit :host github :repo "magit/magit" :ref "f2a61334430291d2162a68138c95ab310a8557f1")
       :commands magit-status)
 #+end_src
@@ -829,12 +797,14 @@ Use Nerd Commenter to efficiently comment/uncomment lines of code.
 
 #+begin_src emacs-lisp
     (use-package evil-nerd-commenter
+      :after evil
       :general (:states 'normal :keymaps 'override "g c" #'evilnc-comment-operator))
 #+end_src
 *** Snipe
 #+begin_src emacs-lisp
     (use-package evil-snipe
       :defer t
+      :after evil
       ;; :commands evil-snipe-local-mode evil-snipe-override-local-mode
       ;; :hook (doom-first-input . evil-snipe-override-mode)
       ;; :hook (doom-first-input . evil-snipe-mode)
@@ -850,6 +820,7 @@ Use Nerd Commenter to efficiently comment/uncomment lines of code.
 *** Surround
 #+begin_src emacs-lisp
     (use-package evil-surround
+      :after evil
       :defer t
       ;; :commands (global-evil-surround-mode
       ;;            evil-surround-edit
@@ -857,6 +828,18 @@ Use Nerd Commenter to efficiently comment/uncomment lines of code.
       ;;            evil-surround-region)
       :config (global-evil-surround-mode 1))
 #+end_src
+*** Colemak adjustments
+
+#+begin_src emacs-lisp
+    (use-package evil-colemak-basics
+      :after evil
+      :init
+      (setq evil-colemak-basics-rotate-t-f-j t
+            evil-escape-key-sequence "vk")
+      :config
+      (global-evil-colemak-basics-mode))
+#+end_src
+
 ** Orderless
 Completion style that divides the pattern into space-separated components, and matches candidates that match all of the components in any order.
 Recomended for packages like vertico, corfu.
