@@ -13,6 +13,8 @@
   - [[#evil-mode][Evil Mode]]
   - [[#colemak-adjustments][Colemak adjustments]]
   - [[#general-keybindings][General Keybindings]]
+  - [[#diminish][Diminish]]
+  - [[#elpaca-wait][ELPACA WAIT]]
   - [[#good-defaults][Good Defaults]]
 - [[#appearance][Appearance]]
   - [[#set-theme][Set Theme]]
@@ -23,7 +25,6 @@
 - [[#development][Development]]
   - [[#projectile][Projectile]]
   - [[#eglot][Eglot]]
-  - [[#commenting][Commenting]]
   - [[#yasnippet][Yasnippet]]
   - [[#formatting][Formatting]]
   - [[#syntax-check][Syntax check]]
@@ -36,12 +37,12 @@
 - [[#other-packages][Other Packages]]
   - [[#nerd-icons][Nerd Icons]]
   - [[#git][Git]]
-  - [[#corfu][Corfu]]
+  - [[#completion-popup---corfu][Completion popup - Corfu]]
   - [[#cape][Cape]]
+  - [[#evil-extensions][Evil extensions]]
   - [[#orderless][Orderless]]
   - [[#vertico-and-marginalia][Vertico and Marginalia]]
   - [[#consult][Consult]]
-  - [[#diminish][Diminish]]
   - [[#rainbow-delimiters][Rainbow Delimiters]]
   - [[#which-key][Which-Key]]
   - [[#disable-line-numbers-in-some-modes][Disable line numbers in some modes]]
@@ -186,105 +187,116 @@ The Leader key is what you will press when you want to access your keybindings (
 To search and replace, use query-replace-regexp to replace one by one C-M-% (SPC to replace n to skip).
 
 #+begin_src emacs-lisp
-    (use-package general
-      :after evil
-      :config
-      (general-evil-setup)
-      ;; Set up 'SPC' as the leader key
-      (general-create-definer j/leader-keys
-        :states '(normal insert visual motion emacs)
-        :keymaps 'override
-        :prefix "SPC"           ;; Set leader key
-        :global-prefix "C-SPC") ;; Set global leader key
+        (use-package general
+          :after evil
+          :config
+          (general-evil-setup)
+          ;; Set up 'SPC' as the leader key
+          (general-create-definer j/leader-keys
+            :states '(normal insert visual motion emacs)
+            :keymaps 'override
+            :prefix "SPC"           ;; Set leader key
+            :global-prefix "C-SPC") ;; Set global leader key
 
-      (general-create-definer j/local-leader-keys
-        :states '(normal insert visual motion emacs)
-        :keymaps 'override
-        :prefix ",")
+          (general-create-definer j/local-leader-keys
+            :states '(normal insert visual motion emacs)
+            :keymaps 'override
+            :prefix ",")
 
-          (j/leader-keys
-            "." '(find-file :wk "Find file")
-            "SPC" '(execute-extended-command :wk "Execute command")
-            ":" '(eval-expression :wk "Evaluate expression")
-            "TAB" '(previous-buffer :wk "Previous buffer")
-            "p" '(projectile-command-map :wk "Projectile command map"))
+              (j/leader-keys
+                "." '(find-file :wk "Find file")
+                "SPC" '(execute-extended-command :wk "Execute command")
+                ":" '(eval-expression :wk "Evaluate expression")
+                "TAB" '(previous-buffer :wk "Previous buffer")
+                "p" '(projectile-command-map :wk "Projectile command map"))
 
-          (j/leader-keys
-            "f" '(:ignore t :wk "Find / File")
-            "f s" '(save-buffer :wk "Save file")
-            "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
-            "f r" '(consult-recent-file :wk "Recent files")
-            "f f" '(consult-fd :wk "Fd search for files")
-            "f g" '(consult-ripgrep :wk "Ripgrep search in files")
-            "f l" '(consult-line :wk "Find line")
-            "f i" '(consult-imenu :wk "Imenu buffer locations"))
+              (j/leader-keys
+                "f" '(:ignore t :wk "Find / File")
+                "f s" '(save-buffer :wk "Save file")
+                "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
+                "f r" '(consult-recent-file :wk "Recent files")
+                "f f" '(find-file :wk "Find file")
+                "f d" '(consult-fd :wk "Fd search for files")
+                "f g" '(consult-ripgrep :wk "Ripgrep search in files")
+                "f l" '(consult-line :wk "Find line")
+                "f i" '(consult-imenu :wk "Imenu buffer locations"))
 
-          (j/leader-keys
-            "b" '(:ignore t :wk "Buffer Bookmarks")
-            "b b" '(consult-buffer :wk "Switch buffer")
-            "b d" '(kill-this-buffer :wk "Delete this buffer")
-            "b i" '(ibuffer :wk "Ibuffer")
-            "b n" '(next-buffer :wk "Next buffer")
-            "b p" '(previous-buffer :wk "Previous buffer")
-            "b r" '(revert-buffer :wk "Reload buffer")
-            "b j" '(consult-bookmark :wk "Bookmark jump"))
+              (j/leader-keys
+                "b" '(:ignore t :wk "Buffer Bookmarks")
+                "b b" '(consult-buffer :wk "Switch buffer")
+                "b d" '(kill-this-buffer :wk "Delete this buffer")
+                "b i" '(ibuffer :wk "Ibuffer")
+                "b n" '(next-buffer :wk "Next buffer")
+                "b p" '(previous-buffer :wk "Previous buffer")
+                "b r" '(revert-buffer :wk "Reload buffer")
+                "b j" '(consult-bookmark :wk "Bookmark jump"))
 
-          (j/leader-keys
-            "d" '(:ignore t :wk "Dired")
-            "d v" '(dired :wk "Open dired")
-            "d j" '(dired-jump :wk "Dired jump to current"))
+              (j/leader-keys
+                "d" '(:ignore t :wk "Dired")
+                "d v" '(dired :wk "Open dired")
+                "d j" '(dired-jump :wk "Dired jump to current"))
 
-          (j/leader-keys
-            "c" '(:ignore t :wk "Code")
-            "c e" '(eglot-reconnect :wk "Eglot Reconnect")
-            "c f" '(eglot-format :wk "Eglot Format")
-            "c l" '(consult-flymake :wk "Consult Flymake"))
+              (j/leader-keys
+                "c" '(:ignore t :wk "Code")
+                "c e" '(eglot-reconnect :wk "Eglot Reconnect")
+                "c f" '(eglot-format :wk "Eglot Format")
+                "c l" '(consult-flymake :wk "Consult Flymake"))
 
-          (j/leader-keys
-            "e" '(:ignore t :wk "Evaluate")
-            "e b" '(eval-buffer :wk "Evaluate elisp in buffer")
-            "e b" '(eval-defun :wk "Evaluate elisp defun")
-            "e e" '(eval-last-sexp :wk "Evaluate elisp last sexp")
-            "e r" '(eval-region :wk "Evaluate elisp in region"))
+              (j/leader-keys
+                "e" '(:ignore t :wk "Evaluate")
+                "e b" '(eval-buffer :wk "Evaluate elisp in buffer")
+                "e b" '(eval-defun :wk "Evaluate elisp defun")
+                "e e" '(eval-last-sexp :wk "Evaluate elisp last sexp")
+                "e r" '(eval-region :wk "Evaluate elisp in region"))
 
+              (j/leader-keys
+                "g" '(:ignore t :wk "Git")
+                "g g" '(magit-status :wk "Magit status"))
 
-          (j/leader-keys
-            "g" '(:ignore t :wk "Git")
-            "g g" '(magit-status :wk "Magit status"))
+              (j/leader-keys
+                "h" '(:ignore t :wk "Help") ;; To get more help use C-h commands (describe variable, function, etc.)
+                "h f" '(describe-function :wk "Describe function")
+                "h h" '(eldoc-doc-buffer :wk "Focus on documentation buffer")
+                "h v" '(describe-variable :wk "Describe variable")
+                "h r" '((lambda () (interactive)
+                          (load-file user-init-file))
+                        :wk "Reload Emacs config"))
+              (j/leader-keys
+                "s" '(:ignore t :wk "Show")
+                "s e" '(eat :wk "Eat terminal"))
 
-          (j/leader-keys
-            "h" '(:ignore t :wk "Help") ;; To get more help use C-h commands (describe variable, function, etc.)
-            "h f" '(describe-function :wk "Describe function")
-            "h v" '(describe-variable :wk "Describe variable")
-            "h r" '((lambda () (interactive)
-                      (load-file user-init-file))
-                    :wk "Reload Emacs config"))
-          (j/leader-keys
-            "s" '(:ignore t :wk "Show")
-            "s e" '(eat :wk "Eat terminal"))
+              (j/leader-keys
+                "t" '(:ignore t :wk "Toggle")
+                "t t" '(visual-line-mode :wk "Toggle truncated lines (wrap)")
+                "t l" '(display-line-numbers-mode :wk "Toggle line numbers"))
 
-          (j/leader-keys
-            "t" '(:ignore t :wk "Toggle")
-            "t t" '(visual-line-mode :wk "Toggle truncated lines (wrap)")
-            "t l" '(display-line-numbers-mode :wk "Toggle line numbers"))
+              (j/leader-keys 
+                 "w" '(:ignore t :wk "Quit")
+                 "w d" '(delete-window :wk "Close window")
+                 "w n" '(evil-window-down :wk "Select window below")
+                 "w e" '(evil-window-up :wk "Select window above")
+                 "w h" '(evil-window-left :wk "Select left window")
+                 "w i" '(evil-window-right :wk "Select right window"))
 
-          (j/leader-keys 
-             "w" '(:ignore t :wk "Quit")
-             "w d" '(delete-window :wk "Close window")
-             "w n" '(evil-window-down :wk "Select window below")
-             "w e" '(evil-window-up :wk "Select window above")
-             "w h" '(evil-window-left :wk "Select left window")
-             "w i" '(evil-window-right :wk "Select right window"))
+              (j/leader-keys 
+                 "q" '(:ignore t :wk "Window")
+                 "q q" '((lambda () (interactive) (save-some-buffers t) (kill-emacs)) :wk "Save all and quit")
+                 "q Q" '(save-buffers-kill-emacs :wk "Save and quit Emacs and Daemon"))
+    )
 
-          (j/leader-keys 
-             "q" '(:ignore t :wk "Window")
-             "q q" '((lambda () (interactive) (save-some-buffers t) (kill-emacs)) :wk "Save all and quit")
-             "q Q" '(save-buffers-kill-emacs :wk "Save and quit Emacs and Daemon"))
-)
-
-(elpaca-wait)
 #+end_src
 
+** Diminish
+This package implements hiding or abbreviation of the modeline displays (lighters) of minor-modes.
+With this package installed, you can add ‘:diminish’ to any use-package block to hide that particular mode in the modeline.
+#+begin_src emacs-lisp
+    (use-package diminish)
+#+end_src
+
+** ELPACA WAIT
+#+begin_src emacs-lisp
+(elpaca-wait)
+#+end_src
 ** Good Defaults
 #+begin_src emacs-lisp
     (use-package emacs
@@ -459,8 +471,11 @@ Use visual block to uncomment easily in Org documents (C-v).
 #+begin_src emacs-lisp
     (use-package eglot
       :ensure nil ;; Don't install eglot because it's now built-in
-      :hook ((c-mode c++-mode ;; Autostart lsp servers for a given mode
-                     nushell-mode)
+      ;; Autostart lsp servers for a given mode
+      :hook ((c-mode
+              c++-mode
+              nushell-mode
+              rust-mode)
              . eglot-ensure)
       :custom
       ;; Good default
@@ -470,17 +485,10 @@ Use visual block to uncomment easily in Org documents (C-v).
       ;; Manual lsp servers
       :config
       (add-to-list 'eglot-server-programs
-                   `(nushell-mode . ("nu" "--lsp"))) ;; Adds our nushell lsp server to eglot's server list
+                   `(nushell-mode . ("nu" "--lsp")
+                    ; rust-mode . ("rust-analyzer")
+                    ))
       )
-#+end_src
-
-** Commenting
-
-Use Nerd Commenter to efficiently comment/uncomment lines of code.
-
-#+begin_src emacs-lisp
-    (use-package evil-nerd-commenter
-      :general (:states 'normal :keymaps 'override "g c" #'evilnc-comment-operator))
 #+end_src
 
 ** Yasnippet
@@ -568,7 +576,7 @@ Currently it's tedious to use Treesitter, because emacs has not yet fully migrat
 
 #+end_src
 
-*** Lua mode
+*** Lua
 Example, how to setup a language mode (if you don't want it, feel free to delete it).
 Use SPC-tab to uncomment the lines.
 # #+begin_src emacs-lisp
@@ -576,14 +584,19 @@ Use SPC-tab to uncomment the lines.
 #       :mode "\\.lua\\'") ;; Only start in a lua file
 # #+end_src
 
+*** Markdown
+#+begin_src emacs-lisp
+    (use-package markdown-mode
+      :mode ("README\\.md\\'" . gfm-mode))
+#+end_src
 *** Nushell
 #+begin_src emacs-lisp
     (use-package nushell-mode
       :ensure (:host github :repo "mrkkrp/nushell-mode")
-      :mode "\\.nu\\'") ;; Only start in a lua file
+      :mode "\\.nu\\'")
 #+end_src
 
-*** Org Mode
+*** Org
 Org mode is one of the things that emacs is loved for.
 Once you've used it for a bit, you'll understand why people love it. Even reading about it can be inspiring!
 For example, this document is effectively the source code and descriptions bound into the one document,
@@ -634,6 +647,16 @@ Org-tempo allows for '<s' followed by TAB to expand to a begin_src tag.
       :after org)
 #+end_src
 
+*** Rust
+#+begin_src emacs-lisp
+    (use-package rust-mode
+      :mode "\\.rs\\'"
+      :config
+      (setq rust-format-on-save t))
+    (use-package flycheck-rust
+      :after rust-mode
+      :hook (flycheck-mode . #'flycheck-rust-setup))
+#+end_src
 ** Terminal
 *** Eat
 Eat(Emulate A Terminal) is a terminal emulator within Emacs.
@@ -730,7 +753,7 @@ Highlights uncommitted changes on the left side of the window (area also known a
       :init (global-diff-hl-mode))
 #+end_src
 
-** Corfu
+** Completion popup - Corfu
 Enhances in-buffer completion with a small completion popup.
 Corfu is a small package, which relies on the Emacs completion facilities and concentrates on providing a polished completion.
 For more configuration options check out their [[https://github.com/minad/corfu][git repository]].
@@ -800,6 +823,40 @@ Read the [[https://github.com/minad/cape#configuration][configuration section]] 
       )
 #+end_src
 
+** Evil extensions
+*** Commenting
+Use Nerd Commenter to efficiently comment/uncomment lines of code.
+
+#+begin_src emacs-lisp
+    (use-package evil-nerd-commenter
+      :general (:states 'normal :keymaps 'override "g c" #'evilnc-comment-operator))
+#+end_src
+*** Snipe
+#+begin_src emacs-lisp
+    (use-package evil-snipe
+      :defer t
+      ;; :commands evil-snipe-local-mode evil-snipe-override-local-mode
+      ;; :hook (doom-first-input . evil-snipe-override-mode)
+      ;; :hook (doom-first-input . evil-snipe-mode)
+      :init
+      (setq evil-snipe-smart-case t
+            evil-snipe-scope 'line
+            evil-snipe-repeat-scope 'visible
+            evil-snipe-char-fold t)
+      :config
+      (evil-snipe-mode +1)
+      (evil-snipe-override-mode +1))
+#+end_src
+*** Surround
+#+begin_src emacs-lisp
+    (use-package evil-surround
+      :defer t
+      ;; :commands (global-evil-surround-mode
+      ;;            evil-surround-edit
+      ;;            evil-Surround-edit
+      ;;            evil-surround-region)
+      :config (global-evil-surround-mode 1))
+#+end_src
 ** Orderless
 Completion style that divides the pattern into space-separated components, and matches candidates that match all of the components in any order.
 Recomended for packages like vertico, corfu.
@@ -892,13 +949,6 @@ Check out their [[https://github.com/minad/consult][git repository]] for more aw
        ;;;; 5. No project support
       ;; (setq consult-project-function nil)
       )
-#+end_src
-
-** Diminish
-This package implements hiding or abbreviation of the modeline displays (lighters) of minor-modes.
-With this package installed, you can add ‘:diminish’ to any use-package block to hide that particular mode in the modeline.
-#+begin_src emacs-lisp
-    (use-package diminish)
 #+end_src
 
 ** Rainbow Delimiters
