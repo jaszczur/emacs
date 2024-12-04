@@ -29,6 +29,7 @@
   - [[#syntax-check][Syntax check]]
   - [[#language-modes][Language modes]]
   - [[#terminal][Terminal]]
+  - [[#tree-sitter][Tree sitter]]
 - [[#multi-file-example][Multi File Example]]
   - [[#adding-the-lisp-directory-to-load-path][Adding the lisp directory to load-path]]
   - [[#sourcing-the-files][Sourcing the files]]
@@ -464,23 +465,36 @@ Use visual block to uncomment easily in Org documents (C-v).
     (use-package eglot
       :ensure nil ;; Don't install eglot because it's now built-in
       ;; Autostart lsp servers for a given mode
-      :hook ((c-mode
-              c++-mode
-              nushell-mode
-              nix-mode
-              rust-mode)
-             . eglot-ensure)
+      ;; MOVED to configuration of *-mode packages
+      ;; :hook ((c-mode
+      ;;         c++-mode
+      ;;         lua-mode
+      ;;         nushell-mode
+      ;;         nix-mode
+      ;;         rust-mode
+      ;;         typescript-mode
+      ;;         web-mode)
+      ;;        . eglot-ensure)
       :custom
       ;; Good default
       (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
-      (eglot-autoshutdown t);; Shutdown unused servers.
+      (eglot-autoshutdown t)	   ;; Shutdown unused servers.
       (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
       ;; Manual lsp servers
       :config
-      (let ((custom-servers '((nushell-mode . ("nu" "--lsp"))
-                              (nix-mode . ("nixd"))))) 
-        (dolist (server custom-servers) (add-to-list 'eglot-server-programs server)))
-      )
+      (defun j/eglot-add-modes-for-server (modes server-cmd)
+        (setq eglot-server-programs 
+              (seq-map (lambda (entry)
+                         (if (and (listp (cdr entry)) ;; Ensure the value is a list
+                                  (string-equal (car (cdr entry)) ;; Match the first element of the value
+                                                server-cmd))
+                             (cons (append (car entry) modes) (cdr entry)) ;; Add `web-mode` to the key
+                           entry)) ;; else return entry
+                       eglot-server-programs)))
+      ;;; Apparently these are already configured in Emacs 29.4. Let's leave these as documentation for future use.
+      ;; (add-to-list 'eglot-server-programs '(nushell-mode . ("nu" "--lsp")))
+      ;; (add-to-list 'eglot-server-programs '(nix-mode . ("nixd")))
+      (j/eglot-add-modes-for-server '(web-mode) "typescript-language-server"))
 #+end_src
 
 ** Yasnippet
@@ -569,12 +583,11 @@ Currently it's tedious to use Treesitter, because emacs has not yet fully migrat
 #+end_src
 
 *** Lua
-Example, how to setup a language mode (if you don't want it, feel free to delete it).
-Use SPC-tab to uncomment the lines.
-# #+begin_src emacs-lisp
-#     (use-package lua-mode
-#       :mode "\\.lua\\'") ;; Only start in a lua file
-# #+end_src
+#+begin_src emacs-lisp
+    (use-package lua-mode
+      :mode "\\.lua\\'"
+      :hook (lua-mode . eglot-ensure)) 
+#+end_src
 
 *** Markdown
 #+begin_src emacs-lisp
@@ -584,12 +597,14 @@ Use SPC-tab to uncomment the lines.
 *** Nix
 #+begin_src emacs-lisp
 (use-package nix-mode
-  :mode "\\.nix\\'")
+  :mode "\\.nix\\'"
+  :hook (nix-mode . eglot-ensure))
 #+end_src
 *** Nushell
 #+begin_src emacs-lisp
     (use-package nushell-mode
       :ensure (:host github :repo "mrkkrp/nushell-mode")
+      :hook (nushell-mode . eglot-ensure)
       :mode "\\.nu\\'")
 #+end_src
 
@@ -648,11 +663,33 @@ Org-tempo allows for '<s' followed by TAB to expand to a begin_src tag.
 #+begin_src emacs-lisp
     (use-package rust-mode
       :mode "\\.rs\\'"
+      :hook (typescript-mode . eglot-ensure)
       :config
       (setq rust-format-on-save t))
     (use-package flycheck-rust
       :after rust-mode
       :hook (flycheck-mode . #'flycheck-rust-setup))
+#+end_src
+*** Typescript
+#+begin_src emacs-lisp
+    (use-package typescript-mode
+      :mode "\\.ts\\'" ;; Automatically activate for .ts files
+      :hook ((typescript-mode . eglot-ensure)
+             (typescript-mode . flycheck-mode)) ;; Just in case I disable global-flycheck-mode
+      :config
+      (setq typescript-indent-level 2)) ;; Set indentation level (adjust as needed)
+#+end_src
+*** Web
+#+begin_src emacs-lisp
+    (use-package web-mode
+      :ensure t
+      :mode "\\.tsx\\'" 
+      :hook ((web-mode . eglot-ensure)
+             (web-mode . flycheck-mode))
+      :config
+      (setq web-mode-content-types-alist '(("jsx" . "\\.tsx\\'"))
+            web-mode-markup-indent-offset 2
+            web-mode-code-indent-offset 2))
 #+end_src
 ** Terminal
 *** Eat
@@ -664,6 +701,15 @@ We setup eat with eshell, if you want to use bash, zsh etc., check out their git
       :hook ('eshell-load-hook #'eat-eshell-mode))
 #+end_src
 
+** Tree sitter
+#+begin_src emacs-lisp
+    (use-package treesit
+      :ensure nil)
+    (use-package treesit-auto
+      :after treesit
+      :config
+      (global-treesit-auto-mode))
+#+end_src
 * Multi File Example
 ** Adding the lisp directory to load-path
 Adds the lisp directory to emacs's load path to search for elisp files.
