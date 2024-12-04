@@ -553,6 +553,30 @@ Currently it's tedious to use Treesitter, because emacs has not yet fully migrat
                   additional
                   additional-insert)))
 #+end_src
+**** Clojure
+#+begin_src emacs-lisp
+    (use-package clojure-mode 
+      :mode (("\\.clj\\'" . clojure-mode)
+             ("\\.cljs\\'" . clojure-mode) 
+             ("\\.cljs\\'" . clojure-mode)
+             ("\\.cljs\\'" . clojure-mode)
+             ("\\.edn\\'" . clojure-mode)))
+
+    (use-package cider
+      :after clojure-mode
+      :hook (clojure-mode . cider-mode)
+      :config
+      (setq cider-save-file-on-load t)
+      (j/local-leader-keys :states 'normal :keymaps 'clojure-mode-map
+        "c" '(:ignore t :wk "Connect")
+        "c j" '(cider-jack-in :wk "Cider jack in")
+        "c c" '(cider-connect :wk "Cider connect")
+        "e" '(:ignore t :wk "Evaluate")
+        "e b" '(cider-eval-buffer :wk "Evaluate Clojure in buffer")
+        "e d" '(cider-eval-defun-at-point :wk "Evaluate Clojure defun")
+        "e e" '(cider-eval-last-sexp :wk "Evaluate Clojure last sexp")
+        "e r" '(cider-eval-region :wk "Evaluate Clojure in region")))
+#+end_src
 **** Common Lisp
 #+begin_src emacs-lisp
     (use-package sly
