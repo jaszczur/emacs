@@ -30,7 +30,6 @@
   - [[#language-modes][Language modes]]
   - [[#terminal][Terminal]]
   - [[#tree-sitter][Tree sitter]]
-  - [[#copilot][Copilot]]
 - [[#multi-file-example][Multi File Example]]
   - [[#adding-the-lisp-directory-to-load-path][Adding the lisp directory to load-path]]
   - [[#sourcing-the-files][Sourcing the files]]
@@ -48,6 +47,8 @@
   - [[#which-key][Which-Key]]
   - [[#disable-line-numbers-in-some-modes][Disable line numbers in some modes]]
   - [[#calendar][Calendar]]
+  - [[#copilot][Copilot]]
+  - [[#gptel][GPtel]]
 - [[#runtime-performance][Runtime Performance]]
 
 * Important to load first
@@ -740,19 +741,6 @@ We setup eat with eshell, if you want to use bash, zsh etc., check out their git
       :config
       (global-treesit-auto-mode))
 #+end_src
-** Copilot
-#+begin_src emacs-lisp
-    (use-package copilot
-      :ensure (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
-      :hook '(prog-mode . copilot-mode)
-      :bind (:map copilot-completion-map
-                  ("<tab>" . 'copilot-accept-completion)
-                  ("TAB" . 'copilot-accept-completion)
-                  ("C-<tab>" . 'copilot-accept-completion-by-word)
-                  ("C-TAB" . 'copilot-accept-completion-by-word))
-      :config
-      (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2)))
-#+end_src
 * Multi File Example
 ** Adding the lisp directory to load-path
 Adds the lisp directory to emacs's load path to search for elisp files.
@@ -1079,6 +1067,29 @@ Which-key is a helper utility for keychords (which key to press).
 (setq calendar-latitude 51.11)
 (setq calendar-longitude 17.0325)
 (setq calendar-location-name "Wroclaw, Poland")
+#+end_src
+** Copilot
+#+begin_src emacs-lisp
+    (use-package copilot
+      :ensure (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+      :hook '(prog-mode . copilot-mode)
+      :bind (:map copilot-completion-map
+                  ("<tab>" . 'copilot-accept-completion)
+                  ("TAB" . 'copilot-accept-completion)
+                  ("C-<tab>" . 'copilot-accept-completion-by-word)
+                  ("C-TAB" . 'copilot-accept-completion-by-word))
+      :config
+      (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2)))
+#+end_src
+** GPtel
+#+begin_src emacs-lisp
+    (use-package gptel
+      :defer t
+      :general
+      (j/leader-keys
+        "o g" '(gptel :wk "GPTel (LLM)"))
+      (j/leader-keys :states '(visual)
+        "o g" '(gptel-send :wk "Send to GPTel (LLM)")))
 #+end_src
 * Runtime Performance
 Dial the GC threshold back down so that garbage collection happens more frequently but in less time.
