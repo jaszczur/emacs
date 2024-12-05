@@ -47,6 +47,8 @@
   - [[#which-key][Which-Key]]
   - [[#disable-line-numbers-in-some-modes][Disable line numbers in some modes]]
   - [[#calendar][Calendar]]
+  - [[#obsidian][Obsidian]]
+- [[#ai-assistance][AI assistance]]
   - [[#copilot][Copilot]]
   - [[#gptel][GPtel]]
 - [[#runtime-performance][Runtime Performance]]
@@ -1068,6 +1070,56 @@ Which-key is a helper utility for keychords (which key to press).
 (setq calendar-longitude 17.0325)
 (setq calendar-location-name "Wroclaw, Poland")
 #+end_src
+** Obsidian
+#+begin_src lua
+    workspaces = {
+      {
+        name = 'notes',
+        path = obsidian_base,
+      },
+    },
+    daily_notes = {
+      folder = 'journal',
+      template = 'daily.md',
+    },
+    templates = {
+      folder = 'templates',
+    },
+    notes_subdir = 'inbox',
+    new_notes_location = 'notes_subdir',
+    preferred_link_style = 'wiki',
+    attachments = {
+      img_folder = 'attachments',
+    },
+#+end_src
+
+#+begin_src emacs-lisp
+    (use-package obsidian
+      :hook
+      (markdown-mode . obsidian-mode)
+      :general
+      (j/leader-keys
+        "n" '(:ignore t :wk "Notes")
+        "n n" '(obsidian-jump :wk "Go to note")
+        "n s" '(obsidian-search :wk "Search")
+        "n c" '(obsidian-capture :wk "Capture")
+        "n u" '(obsidian-update :wk "Update"))
+      (j/local-leader-keys :keymaps 'obsidian-mode-map
+        "l" '(:ignore t :wk "Link")
+        "l l" '(obsidian-insert-link :wk "Insert")
+        "l f" '(obsidian-follow-link-at-point :wk "Follow")
+        "l b" '(obsidian-backlink-jump :wk "Backlinks"))
+      :config
+      (obsidian-specify-path "~/Sync/obsidian")
+      ;; (global-obsidian-mode t)
+      :custom
+      ;; This directory will be used for `obsidian-capture' if set.
+      (obsidian-inbox-directory "inbox")
+      (obsidian-daily-notes-directory "journal")
+      (obsidian-templates-directory "templates")
+      (obsidian-daily-note-template "daily.md"))
+#+end_src
+* AI assistance
 ** Copilot
 #+begin_src emacs-lisp
     (use-package copilot
