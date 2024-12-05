@@ -1071,28 +1071,6 @@ Which-key is a helper utility for keychords (which key to press).
 (setq calendar-location-name "Wroclaw, Poland")
 #+end_src
 ** Obsidian
-#+begin_src lua
-    workspaces = {
-      {
-        name = 'notes',
-        path = obsidian_base,
-      },
-    },
-    daily_notes = {
-      folder = 'journal',
-      template = 'daily.md',
-    },
-    templates = {
-      folder = 'templates',
-    },
-    notes_subdir = 'inbox',
-    new_notes_location = 'notes_subdir',
-    preferred_link_style = 'wiki',
-    attachments = {
-      img_folder = 'attachments',
-    },
-#+end_src
-
 #+begin_src emacs-lisp
     (use-package obsidian
       :hook
@@ -1100,9 +1078,10 @@ Which-key is a helper utility for keychords (which key to press).
       :general
       (j/leader-keys
         "n" '(:ignore t :wk "Notes")
+        "n c" '(obsidian-capture :wk "Capture note")
+        "n d" '(obsidian-daily-note :wk "Capture daily note")
         "n n" '(obsidian-jump :wk "Go to note")
         "n s" '(obsidian-search :wk "Search")
-        "n c" '(obsidian-capture :wk "Capture")
         "n u" '(obsidian-update :wk "Update"))
       (j/local-leader-keys :keymaps 'obsidian-mode-map
         "l" '(:ignore t :wk "Link")
