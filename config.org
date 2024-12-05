@@ -260,6 +260,11 @@ To search and replace, use query-replace-regexp to replace one by one C-M-% (SPC
             "o c" '(calendar :wk "Calendar"))
 
           (j/leader-keys
+            "r" '(:ignore t :wk "Region")
+            "r n" '(narrow-to-region :wk "Narrow to region")
+            "r w" '(widen :wk "Widen"))
+
+          (j/leader-keys
             "t" '(:ignore t :wk "Toggle")
             "t t" '(visual-line-mode :wk "Toggle truncated lines (wrap)")
             "t l" '(display-line-numbers-mode :wk "Toggle line numbers"))
