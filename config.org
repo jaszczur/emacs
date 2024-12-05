@@ -318,6 +318,7 @@ With this package installed, you can add ‘:diminish’ to any use-package bloc
 
       ;;(dired-kill-when-opening-new-dired-buffer t) ;; Dired don't create new buffer
       (recentf-mode t) ;; Enable recent file mode
+      (save-place-mode 1) ;; Restore file location
 
       ;;(global-visual-line-mode t)           ;; Enable truncated lines
       (display-line-numbers-type 'relative) ;; Relative line numbers
