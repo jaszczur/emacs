@@ -836,8 +836,18 @@ Notes:
       ;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
       ;; be used globally (M-/).  See also the customization variable
       ;; `global-corfu-modes' to exclude certain modes.
+      :general 
+      (:keymaps 'corfu-map
+                "M-SPC" 'corfu-insert-separator
+                "RET" nil
+                "C-n" 'corfu-next
+                "C-p" 'corfu-previous
+                "C-y" 'corfu-insert)
+      (:states 'insert
+               "C-y" nil)
       :init
-      (global-corfu-mode))
+      (global-corfu-mode)
+      (corfu-history-mode))
 
     (use-package nerd-icons-corfu
       :after corfu
