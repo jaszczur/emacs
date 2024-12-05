@@ -30,6 +30,7 @@
   - [[#language-modes][Language modes]]
   - [[#terminal][Terminal]]
   - [[#tree-sitter][Tree sitter]]
+  - [[#copilot][Copilot]]
 - [[#multi-file-example][Multi File Example]]
   - [[#adding-the-lisp-directory-to-load-path][Adding the lisp directory to load-path]]
   - [[#sourcing-the-files][Sourcing the files]]
@@ -513,8 +514,8 @@ To use it write out the full keyword (or use autocompletion) and press Tab.
 ** Formatting
 #+begin_src emacs-lisp
     (use-package apheleia
-    :config 
-(apheleia-global-mode +1))
+     :config 
+     (apheleia-global-mode +1))
 #+end_src
 ** Syntax check
 #+begin_src emacs-lisp
@@ -738,6 +739,19 @@ We setup eat with eshell, if you want to use bash, zsh etc., check out their git
       :after treesit
       :config
       (global-treesit-auto-mode))
+#+end_src
+** Copilot
+#+begin_src emacs-lisp
+    (use-package copilot
+      :ensure (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+      :hook '(prog-mode . copilot-mode)
+      :bind (:map copilot-completion-map
+                  ("<tab>" . 'copilot-accept-completion)
+                  ("TAB" . 'copilot-accept-completion)
+                  ("C-<tab>" . 'copilot-accept-completion-by-word)
+                  ("C-TAB" . 'copilot-accept-completion-by-word))
+      :config
+      (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2)))
 #+end_src
 * Multi File Example
 ** Adding the lisp directory to load-path
