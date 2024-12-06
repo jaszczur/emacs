@@ -4,9 +4,10 @@
 #+Startup: show4levels
 #+Options: toc:3
 
-* Table Of Contents :toc:
+* Table Of Contents :toc_3:
 - [[#important-to-load-first][Important to load first]]
   - [[#startup-performance][Startup Performance]]
+  - [[#native-compilation-options][Native compilation options]]
   - [[#auto-tangle-configuration-file][Auto-tangle Configuration file]]
   - [[#elpaca-package-manager][Elpaca package manager]]
   - [[#use-package][Use Package]]
@@ -19,6 +20,8 @@
   - [[#set-theme][Set Theme]]
   - [[#transparency][Transparency]]
   - [[#fonts][Fonts]]
+    - [[#setting-fonts][Setting fonts]]
+    - [[#zooming-inout][Zooming In/Out]]
   - [[#modeline][Modeline]]
   - [[#project-tree][Project tree]]
 - [[#development][Development]]
@@ -28,7 +31,17 @@
   - [[#formatting][Formatting]]
   - [[#syntax-check][Syntax check]]
   - [[#language-modes][Language modes]]
+    - [[#lisps][Lisps]]
+    - [[#lua][Lua]]
+    - [[#markdown][Markdown]]
+    - [[#nix][Nix]]
+    - [[#nushell][Nushell]]
+    - [[#org][Org]]
+    - [[#rust][Rust]]
+    - [[#typescript][Typescript]]
+    - [[#web][Web]]
   - [[#terminal][Terminal]]
+    - [[#eat][Eat]]
   - [[#tree-sitter][Tree sitter]]
 - [[#multi-file-example][Multi File Example]]
   - [[#adding-the-lisp-directory-to-load-path][Adding the lisp directory to load-path]]
@@ -37,9 +50,15 @@
 - [[#other-packages][Other Packages]]
   - [[#nerd-icons][Nerd Icons]]
   - [[#git][Git]]
+    - [[#magit][Magit]]
+    - [[#diff-hl][Diff-hl]]
   - [[#completion-popup---corfu][Completion popup - Corfu]]
   - [[#cape][Cape]]
   - [[#evil-extensions][Evil extensions]]
+    - [[#commenting][Commenting]]
+    - [[#snipe][Snipe]]
+    - [[#surround][Surround]]
+    - [[#colemak-adjustments][Colemak adjustments]]
   - [[#orderless][Orderless]]
   - [[#vertico-and-marginalia][Vertico and Marginalia]]
   - [[#consult][Consult]]
@@ -61,6 +80,10 @@ Make startup faster by reducing the frequency of garbage collection. This will b
     (setq gc-cons-threshold (* 50 1000 1000))
 #+end_src
 
+** Native compilation options
+#+begin_src emacs-lisp
+    (setq native-comp-async-report-warnings-errors 'silent)
+#+end_src
 ** Auto-tangle Configuration file
 Auto-Tangle Org configuration file for better startup times.
 If you want to use this don't forget to add this to the top of the org document (#+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes)
@@ -201,9 +224,10 @@ To search and replace, use query-replace-regexp to replace one by one C-M-% (SPC
 
           (j/leader-keys
             "." '(find-file :wk "Find file")
+            "/" '(consult-line :wk "Search buffer")
             "!" '(eat :wk "Terminal")
-            "SPC" '(execute-extended-command :wk "Execute command")
             ":" '(eval-expression :wk "Evaluate expression")
+            "SPC" '(execute-extended-command :wk "Execute command")
             "TAB" '(previous-buffer :wk "Previous buffer")
             "p" '(projectile-command-map :wk "Projectile command map"))
 
@@ -876,7 +900,6 @@ Read the [[https://github.com/minad/cape#configuration][configuration section]] 
       (add-to-list 'completion-at-point-functions #'cape-file) ;; Path completion
       (add-to-list 'completion-at-point-functions #'cape-elisp-block) ;; Complete elisp in Org or Markdown mode
       (add-to-list 'completion-at-point-functions #'cape-keyword) ;; Keyword/Snipet completion
-
       ;;(add-to-list 'completion-at-point-functions #'cape-abbrev) ;; Complete abbreviation
       ;;(add-to-list 'completion-at-point-functions #'cape-history) ;; Complete from Eshell, Comint or minibuffer history
       ;;(add-to-list 'completion-at-point-functions #'cape-line) ;; Complete entire line from current buffer
@@ -1084,8 +1107,8 @@ Which-key is a helper utility for keychords (which key to press).
 ** Obsidian
 #+begin_src emacs-lisp
     (use-package obsidian
-      :hook
-      (markdown-mode . obsidian-mode)
+      ;; :hook
+      ;; (markdown-mode . obsidian-mode)
       :general
       (j/leader-keys
         "n" '(:ignore t :wk "Notes")
@@ -1101,7 +1124,7 @@ Which-key is a helper utility for keychords (which key to press).
         "l b" '(obsidian-backlink-jump :wk "Backlinks"))
       :config
       (obsidian-specify-path "~/Sync/obsidian")
-      ;; (global-obsidian-mode t)
+      (global-obsidian-mode t)
       :custom
       ;; This directory will be used for `obsidian-capture' if set.
       (obsidian-inbox-directory "inbox")
