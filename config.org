@@ -17,13 +17,15 @@
   - [[#elpaca-wait][ELPACA WAIT]]
   - [[#good-defaults][Good Defaults]]
 - [[#appearance][Appearance]]
-  - [[#set-theme][Set Theme]]
-  - [[#transparency][Transparency]]
   - [[#fonts][Fonts]]
     - [[#setting-fonts][Setting fonts]]
     - [[#zooming-inout][Zooming In/Out]]
   - [[#modeline][Modeline]]
   - [[#project-tree][Project tree]]
+  - [[#set-theme][Set Theme]]
+  - [[#sideline][Sideline]]
+  - [[#transparency][Transparency]]
+  - [[#eldoc-box][Eldoc box]]
 - [[#development][Development]]
   - [[#projectile][Projectile]]
   - [[#eglot][Eglot]]
@@ -389,32 +391,6 @@ With this package installed, you can add ‘:diminish’ to any use-package bloc
 #+end_src
 
 * Appearance
-** Set Theme
-Set catppuccin theme, if you want some themes try out doom-themes.
-Use consult-theme to easily try out themes (*Epilepsy* Warning).
-#+begin_src emacs-lisp
-        (use-package catppuccin-theme
-          :config
-          (setq catppuccin-flavor 'macchiato) ;; or 'latte, 'macchiato, or 'mocha
-          (load-theme 'catppuccin :no-confirm) ;; We need to add :no-confirm to trust this package
-
-          (defun j/toggle-dark-mode ()
-            (interactive)
-            (setq catppuccin-flavor (if (eq catppuccin-flavor 'latte) 'macchiato 'latte))
-            (catppuccin-reload))
-
-                  (j/leader-keys
-                    "t d" '(j/toggle-dark-mode :wk "Toggle dark mode"))
-
-    )
-#+end_src
-
-** Transparency
-With Emacs version 29, true transparency has been added.
-#+begin_src emacs-lisp
-    (add-to-list 'default-frame-alist '(alpha-background . 90)) ;; For all new frames henceforth
-#+end_src
-
 ** Fonts
 *** Setting fonts
 #+begin_src emacs-lisp
@@ -476,6 +452,120 @@ Replace the default modeline with a prettier more useful.
     (use-package treemacs-nerd-icons
       :after treemacs
       :config (treemacs-load-theme "nerd-icons"))
+#+end_src
+** Set Theme
+Set catppuccin theme, if you want some themes try out doom-themes.
+Use consult-theme to easily try out themes (*Epilepsy* Warning).
+#+begin_src emacs-lisp
+    (use-package catppuccin-theme
+      :config
+      (setq catppuccin-flavor 'macchiato) ;; or 'latte, 'macchiato, or 'mocha
+      (load-theme 'catppuccin :no-confirm) ;; We need to add :no-confirm to trust this package
+
+      (defun j/toggle-dark-mode ()
+        (interactive)
+        (setq catppuccin-flavor (if (eq catppuccin-flavor 'latte) 'macchiato 'latte))
+        (catppuccin-reload))
+
+      (j/leader-keys
+        "t d" '(j/toggle-dark-mode :wk "Toggle dark mode"))
+
+      )
+#+end_src
+
+** Sideline
+Display errors inline (like virt_text in nvim).
+
+#+begin_src emacs-lisp
+     (use-package sideline
+       :init 
+       (setq sideline-backends-right '(sideline-flycheck))
+      ;; (setq sideline-backends-left-skip-current-line t   ; don't display on current line (left)
+      ;;       sideline-backends-right-skip-current-line t  ; don't display on current line (right)
+      ;;       sideline-order-left 'down                    ; or 'up
+      ;;       sideline-order-right 'up                     ; or 'down
+      ;;       sideline-format-left "%s   "                 ; format for left aligment
+      ;;       sideline-format-right "   %s"                ; format for right aligment
+      ;;       sideline-priority 100                        ; overlays' priority
+      ;;       sideline-display-backend-name t)
+    )            ; display the backend name
+#+end_src
+
+Let's configure flycheck backend for sideline
+
+#+begin_src emacs-lisp
+    (use-package sideline-flycheck 
+      ;; :ensure (:host github :repo "emacs-sideline/sideline-eglot")
+      :hook 
+      (flycheck-mode . sideline-mode)
+      (flycheck-mode . sideline-flycheck-setup))
+#+end_src
+
+Let's configure also eglot backend for sideline
+
+#+begin_src emacs-lisp
+    ;; (use-package sideline-eglot 
+    ;;   :ensure (:host github :repo "emacs-sideline/sideline-eglot")
+    ;;   :hook (eglot-mode . sideline-mode)
+    ;;   :init
+    ;;   (setq sideline-backends-right '(sideline-eglot)))
+#+end_src
+
+** Transparency
+With Emacs version 29, true transparency has been added.
+#+begin_src emacs-lisp
+    (add-to-list 'default-frame-alist '(alpha-background . 90)) ;; For all new frames henceforth
+#+end_src
+
+** Eldoc box - WiP
+Display documentation in child frame instead of in the bottom. Also display when asked for (not always)
+
+#+begin_src emacs-lisp
+            ;; (use-package eldoc-box
+            ;;   :after eldoc
+            ;;   ;; :hook '(eglot-managed-mode 'eldoc-box-hover-mode)
+            ;;   :hook (eldoc-mode . eldoc-box-hover-mode)
+            ;;   :general
+            ;;   (:states 'normal
+            ;;    ;; :keymaps 'override
+            ;;    :keymaps 'eglot-mode-map
+            ;;    "K" 'eldoc-box-help-at-point)
+            ;;   :config
+            ;;   ;; Disable eglot hover provider
+            ;;   (add-to-list 'eglot-ignored-server-capabilites :hoverProvider))
+
+   ;     (use-package eldoc-box
+   ;       :after eglot
+   ;       :init
+   ;       ;;; Disable eglot hover provider
+   ;       ;(add-to-list 'eglot-ignored-server-capabilites :hoverProvider)
+   ;       (add-to-list 'eglot-stay-out-of 'eldoc)
+   ;
+   ;       :config
+   ;       (defun rex/eldoc-box-scroll-up ()
+   ;         "Scroll up in `eldoc-box--frame'"
+   ;         (interactive)
+   ;         (with-current-buffer eldoc-box--buffer
+   ;           (with-selected-frame eldoc-box--frame
+   ;             (scroll-down 3))))
+   ;       (defun rex/eldoc-box-scroll-down ()
+   ;         "Scroll down in `eldoc-box--frame'"
+   ;         (interactive)
+   ;         (with-current-buffer eldoc-box--buffer
+   ;           (with-selected-frame eldoc-box--frame
+   ;             (scroll-up 3))))
+   ;
+   ;       :general
+   ;       (:keymaps 'eglot-mode-map
+   ;                 "C-e" 'rex/eldoc-box-scroll-up
+   ;                 "C-n" 'rex/eldoc-box-scroll-down
+   ;                 "M-h" 'eldoc-box-eglot-help-at-point)
+   ;       (:keymaps 'eglot-mode-map :states 'normal
+   ;                 "S-k" 'eldoc-box-eglot-help-at-point)
+   ;)
+
+
+
 #+end_src
 * Development
 ** Projectile
@@ -548,10 +638,15 @@ Use visual block to uncomment easily in Org documents (C-v).
       ;; (add-to-list 'eglot-server-programs '(nushell-mode . ("nu" "--lsp")))
       ;; (add-to-list 'eglot-server-programs '(nix-mode . ("nixd")))
       (j/eglot-add-modes-for-server '(web-mode) "typescript-language-server") 
+
       ;; Add scala-ts-mode
       (add-to-list 'eglot-server-programs
              `((scala-mode scala-ts-mode)
-                . ,(alist-get 'scala-mode eglot-server-programs))))
+                . ,(alist-get 'scala-mode eglot-server-programs))) 
+
+      ;; Use rust-analyzer by default
+      (add-to-list 'eglot-server-programs
+             '(rust-mode . ("rust-analyzer"))))
 #+end_src
 
 ** Yasnippet
@@ -575,6 +670,15 @@ To use it write out the full keyword (or use autocompletion) and press Tab.
   :defer t
   :diminish
   :init (global-flycheck-mode))
+#+end_src
+
+Make it work with Eglot
+
+#+begin_src emacs-lisp
+    (use-package flycheck-eglot
+      :after (flycheck eglot)
+      :config
+      (global-flycheck-eglot-mode 1))
 #+end_src
 ** Language modes
 It's not required for every language like C,C++,C#,Java,Javascript etc. to install language mode packages,
@@ -744,7 +848,9 @@ Org-tempo allows for '<s' followed by TAB to expand to a begin_src tag.
 #+begin_src emacs-lisp
     (use-package rust-mode
       :mode "\\.rs\\'"
-      :hook (typescript-mode . eglot-ensure)
+      :hook 
+      (rust-mode . eglot-ensure)
+      (rust-ts-mode . eglot-ensure)
       :config
       (setq rust-format-on-save t))
     (use-package flycheck-rust
@@ -755,8 +861,8 @@ Org-tempo allows for '<s' followed by TAB to expand to a begin_src tag.
 #+begin_src emacs-lisp
     ;; (use-package scala-mode
     ;;   :interpreter ("scala" . scala-mode))
-    
     (use-package scala-ts-mode
+      :hook (scala-ts-mode . eglot-ensure)
       :interpreter ("scala" . scala-mode))
 
     ;; Enable sbt mode for executing sbt commands
@@ -913,8 +1019,15 @@ Notes:
                 "M-SPC" 'corfu-insert-separator
                 "RET" nil
                 "C-n" 'corfu-next
+                "C-e" 'corfu-previous
                 "C-p" 'corfu-previous
                 "C-y" 'corfu-insert)
+      (:keymaps 'corfu-popupinfo-map
+                "C-S-n" 'corfu-popupinfo-scroll-up
+                "C-S-e" 'corfu-popupinfo-scroll-down
+                "C-S-p" 'corfu-popupinfo-scroll-down
+                "C-<down>" 'corfu-popupinfo-scroll-up
+                "C-<up>" 'corfu-popupinfo-scroll-down)
       (:states 'insert
                "C-y" nil)
       :init
