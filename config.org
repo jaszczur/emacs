@@ -38,6 +38,7 @@
     - [[#nushell][Nushell]]
     - [[#org][Org]]
     - [[#rust][Rust]]
+    - [[#scala][Scala]]
     - [[#typescript][Typescript]]
     - [[#web][Web]]
   - [[#terminal][Terminal]]
@@ -523,9 +524,15 @@ Use visual block to uncomment easily in Org documents (C-v).
       ;; Good default
       (eglot-events-buffer-size 0) ;; No event buffers (Lsp server logs)
       (eglot-autoshutdown t)	   ;; Shutdown unused servers.
-      (eglot-report-progress nil) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
+      (eglot-report-progress t) ;; Disable lsp server logs (Don't show lsp messages at the bottom, java)
       ;; Manual lsp servers
       :config
+      (setq-default eglot-workspace-configuration
+                    '(
+                      :metals (
+                               :superMethodLensesEnabled t
+                               :showInferredType t)))
+
       (defun j/eglot-add-modes-for-server (modes server-cmd)
         (setq eglot-server-programs 
               (seq-map (lambda (entry)
@@ -535,10 +542,14 @@ Use visual block to uncomment easily in Org documents (C-v).
                              (cons (append (car entry) modes) (cdr entry)) ;; Add `web-mode` to the key
                            entry)) ;; else return entry
                        eglot-server-programs)))
-      ;;; Apparently these are already configured in Emacs 29.4. Let's leave these as documentation for future use.
+          ;;; Apparently these are already configured in Emacs 29.4. Let's leave these as documentation for future use.
       ;; (add-to-list 'eglot-server-programs '(nushell-mode . ("nu" "--lsp")))
       ;; (add-to-list 'eglot-server-programs '(nix-mode . ("nixd")))
-      (j/eglot-add-modes-for-server '(web-mode) "typescript-language-server"))
+      (j/eglot-add-modes-for-server '(web-mode) "typescript-language-server") 
+      ;; Add scala-ts-mode
+      (add-to-list 'eglot-server-programs
+             `((scala-mode scala-ts-mode)
+                . ,(alist-get 'scala-mode eglot-server-programs))))
 #+end_src
 
 ** Yasnippet
@@ -738,6 +749,28 @@ Org-tempo allows for '<s' followed by TAB to expand to a begin_src tag.
       :after rust-mode
       :hook (flycheck-mode . #'flycheck-rust-setup))
 #+end_src
+*** Scala
+#+begin_src emacs-lisp
+    ;; (use-package scala-mode
+    ;;   :interpreter ("scala" . scala-mode))
+    
+    (use-package scala-ts-mode
+      :interpreter ("scala" . scala-mode))
+
+    ;; Enable sbt mode for executing sbt commands
+    (use-package sbt-mode
+      :commands sbt-start sbt-command
+      :config
+      ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+      ;; allows using SPACE when in the minibuffer
+      (substitute-key-definition
+       'minibuffer-complete-word
+       'self-insert-command
+       minibuffer-local-completion-map)
+      ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+      (setq sbt:program-options '("-Dsbt.supershell=false")))
+
+#+end_src
 *** Typescript
 #+begin_src emacs-lisp
     (use-package typescript-mode
@@ -772,7 +805,9 @@ We setup eat with eshell, if you want to use bash, zsh etc., check out their git
 ** Tree sitter
 #+begin_src emacs-lisp
     (use-package treesit
-      :ensure nil)
+      :ensure nil
+      :config
+      (setq treesit-font-lock-level 4))
     (use-package treesit-auto
       :after treesit
       :config
