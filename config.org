@@ -55,6 +55,7 @@
     - [[#diff-hl][Diff-hl]]
   - [[#completion-popup---corfu][Completion popup - Corfu]]
   - [[#cape][Cape]]
+  - [[#direnv][Direnv]]
   - [[#evil-extensions][Evil extensions]]
     - [[#commenting][Commenting]]
     - [[#snipe][Snipe]]
@@ -343,6 +344,7 @@ With this package installed, you can add ‘:diminish’ to any use-package bloc
       (scroll-bar-mode nil)       ;; Disable the scroll bar
       (tool-bar-mode nil)         ;; Disable the tool bar
       (inhibit-startup-screen t)  ;; Disable welcome screen
+      (visible-bell t)            ;; Show sign instead of beep
 
       (delete-selection-mode t)   ;; Select text and delete it by typing.
       (electric-indent-mode nil)  ;; Turn off the weird indenting that Emacs does by default.
@@ -955,6 +957,14 @@ Read the [[https://github.com/minad/cape#configuration][configuration section]] 
       )
 #+end_src
 
+** Direnv
+#+begin_src emacs-lisp
+    (use-package envrc
+      :hook (elpaca-after-init . envrc-global-mode)
+      :config
+      (j/leader-keys :states '(normal) :keymaps '(envrc-mode-map)
+        "d e" '(envrc-command-map :wk "Direnv")))
+#+end_src
 ** Evil extensions
 *** Commenting
 Use Nerd Commenter to efficiently comment/uncomment lines of code.
